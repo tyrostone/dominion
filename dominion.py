@@ -10,7 +10,7 @@ class Dominion(object):
 
     def run(self):
         self.starting_player = self.determine_player_order()
-        current_turn = Turn()
+        current_turn = Turn(self.starting_player)
         return current_turn
 
     def generate_board(self):
@@ -44,8 +44,21 @@ class Dominion(object):
 
 
 class Turn(object):
-    def __init__(self):
-        self.phases = ['action', 'buy', 'cleanup']
+    def __init__(self, player):
+        self.player = player
+        self.phases = [Phase('action', self.player), Phase('buy', self.player),
+                       Phase('cleanup', self.player)]
+        self.take_phase(self.phases[0], self.player)
+
+    def take_phase(self, phase, player):
+        pass
+
+
+class Phase(object):
+    def __init__(self, phase_type, player):
+        self.player = player
+        self.type = phase_type
+        pass
 
 
 class Player(object):

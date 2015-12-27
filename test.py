@@ -1,6 +1,6 @@
 import unittest
 
-from dominion import Board, Card, Dominion, KingdomCard, Player, Slot, Turn
+from dominion import Board, Card, Dominion, KingdomCard, Phase, Player, Slot, Turn
 
 
 class DominionTest(unittest.TestCase):
@@ -40,9 +40,15 @@ class DominionTest(unittest.TestCase):
 
 class TurnTest(unittest.TestCase):
 
-    def test_turn_has_action_phase(self):
-        turn = Turn()
-        self.assertIn('action', turn.phases)
+    def test_turn_has_three_phases(self):
+        player = Player()
+        turn = Turn(player)
+        self.assertEqual(3, len(turn.phases))
+
+    def test_turn_first_phase_is_action(self):
+        player = Player()
+        turn = Turn(player)
+        self.assertEqual('action', turn.phases[0].type)
 
 
 class PlayerTest(unittest.TestCase):
