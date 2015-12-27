@@ -7,6 +7,7 @@ class Dominion(object):
     def __init__(self, players=2):
         self.players = self.generate_players(players)
         self.board = self.generate_board()
+        self.starting_player = self.determine_starting_player()
 
     def run(self):
         pass
@@ -20,11 +21,16 @@ class Dominion(object):
             players_list.append(Player())
         return players_list
 
+    def determine_starting_player(self):
+        random_int = random.randint(0, len(self.players)-1)
+        return self.players[random_int]
+
 
 class Player(object):
     def __init__(self):
         self.cards = self.generate_starting_cards()
         self.victory_points = len(self.cards['victory_cards'])
+        self.is_starting = False
 
     def generate_starting_cards(self):
         cards = {}
@@ -73,12 +79,18 @@ class Slot(object):
 class Card(object):
     def __init__(self, card_type, name=None, cost=None):
         card_types_list = ['kingdom', 'treasure', 'victory']
-        self.type = card_type if card_type in card_types_list else None
-        self.value = None if name is None else self.get_card_info_from_name(
-            card_type, name, 'value')
-        self.cost = None if name is None else self.get_card_info_from_name(
-            card_type, name, 'cost')
         self.name = name
+        self.type = card_type if card_type in card_types_list else None
+        self.value = self.set_card_attribute(
+            name, card_type, 'value')
+        self.cost = self.set_card_attribute(
+            name, card_type, 'cost')
+        self.victory_points = self.set_card_attribute(
+            name, card_type, 'victory_points')
+
+    def set_card_attribute(self, name, card_type, attribute):
+        return None if name is None else self.get_card_info_from_name(
+            card_type, name, attribute)
 
     def get_card_info_from_name(self, card_type, name, info):
         for card in card_types[card_type]:

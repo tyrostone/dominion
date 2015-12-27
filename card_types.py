@@ -46,9 +46,9 @@ card_types = \
      'treasure':
      [{'Copper': {'cost': 0, 'value': 1}},
       {'Silver': {'cost': 3, 'value': 2}},
-      {'Gold': {'cost': 6, 'value': 3}}],
+      {'Gold':   {'cost': 6, 'value': 3}}],
      'victory':
-     [{'Estate': {'cost': 2, 'victory_points': 2}},
-      {'Duchy': {'cost': 5, 'victory_points': 3}},
+     [{'Estate':   {'cost': 2, 'victory_points': 1}},
+      {'Duchy':    {'cost': 5, 'victory_points': 3}},
       {'Province': {'cost': 8, 'victory_points': 6}}]
      }

@@ -1,13 +1,14 @@
 import unittest
 
-from dominion import Board, Card, Dominion, KingdomCard, Player, Slot, TreasureCard
+from dominion import Board, Card, Dominion, KingdomCard, Player, Slot
 
 
 class DominionTest(unittest.TestCase):
 
-    def test_game_runs(self):
+    def test_game_sets_starting_player_on_run(self):
         game = Dominion()
         game.run()
+        self.assertIsInstance(game.starting_player, Player)
 
     def test_game_has_specified_number_of_players(self):
         game = Dominion(players=4)
@@ -49,6 +50,10 @@ class PlayerTest(unittest.TestCase):
         player = Player()
         self.assertEqual(3, len([x for x in player.cards['victory_cards']
                                  if x.name == 'Estate']))
+
+    def test_player_starts_not_as_starting_player(self):
+        player = Player()
+        self.assertFalse(player.is_starting)
 
 
 class BoardTest(unittest.TestCase):
