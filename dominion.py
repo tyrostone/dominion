@@ -7,10 +7,11 @@ class Dominion(object):
     def __init__(self, players=2):
         self.players = self.generate_players(players)
         self.board = self.generate_board()
-        self.starting_player = self.determine_starting_player()
 
     def run(self):
-        pass
+        self.starting_player = self.determine_player_order()
+        current_turn = Turn()
+        return current_turn
 
     def generate_board(self):
         return Board()
@@ -21,9 +22,30 @@ class Dominion(object):
             players_list.append(Player())
         return players_list
 
+    def determine_player_order(self):
+        starting_player = self.determine_starting_player()
+        self.players = self.sort_players(starting_player)
+        return starting_player
+
     def determine_starting_player(self):
         random_int = random.randint(0, len(self.players)-1)
         return self.players[random_int]
+
+    def sort_players(self, starting_player):
+        sorted_player_list = []
+        player_list = self.players
+
+        sorted_player_list.append(starting_player)
+        for player in player_list:
+            if player == starting_player:
+                continue
+            sorted_player_list.append(player)
+        return sorted_player_list
+
+
+class Turn(object):
+    def __init__(self):
+        self.phases = ['action', 'buy', 'cleanup']
 
 
 class Player(object):

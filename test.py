@@ -1,32 +1,48 @@
 import unittest
 
-from dominion import Board, Card, Dominion, KingdomCard, Player, Slot
+from dominion import Board, Card, Dominion, KingdomCard, Player, Slot, Turn
 
 
 class DominionTest(unittest.TestCase):
 
-    def test_game_sets_starting_player_on_run(self):
+    def test_game_sets_starting_player(self):
         game = Dominion()
         game.run()
         self.assertIsInstance(game.starting_player, Player)
 
     def test_game_has_specified_number_of_players(self):
-        game = Dominion(players=4)
+        game = Dominion(4)
+        game.run()
         self.assertEqual(4, len(game.players))
 
     def test_game_has_two_players_if_none_specified(self):
         game = Dominion()
+        game.run()
         self.assertEqual(2, len(game.players))
 
     def test_game_players_type_is_player_object(self):
         game = Dominion()
+        game.run()
         players = game.players
         for player in players:
             self.assertIsInstance(player, Player)
 
     def test_game_has_board(self):
         game = Dominion()
+        game.run()
         self.assertIsInstance(game.board, Board)
+
+    def test_game_generates_turn_when_run(self):
+        game = Dominion()
+        turn = game.run()
+        self.assertIsInstance(turn, Turn)
+
+
+class TurnTest(unittest.TestCase):
+
+    def test_turn_has_action_phase(self):
+        turn = Turn()
+        self.assertIn('action', turn.phases)
 
 
 class PlayerTest(unittest.TestCase):
