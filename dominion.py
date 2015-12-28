@@ -51,19 +51,23 @@ class Turn(object):
         self.phases = [Phase('action', self.player), Phase('buy', self.player),
                        Phase('cleanup', self.player)]
 
-        for phase in self.phases:
-            outcome = self.take_phase(phase, self.player)
+        #for phase in self.phases:
+        #    outcome = self.take_phase(phase, self.player)
 
     def take_phase(self, phase, player):
-        if phase == 'action':
-            action_cards = player.get_action_cards()
-            if action_cards:
-                if len(action_cards) == 1:
-                    player.play_card(action_cards[0], self)
+        if phase.type == 'action':
+            available_actions = self.actions
+            while available_actions > 0:
+                action_cards = player.get_cards_of_type('kingdom')
+                if action_cards:
+                    if len(action_cards) == 1:
+                        player.play_card(action_cards[0], self)
+                        available_actions = 0  # Otherwise we infinite loop
+                    else:
+                        pass
                 else:
-                    pass
-            else:
-                return False
+                    return False
+            return True
 
 
 class Phase(object):
@@ -74,21 +78,29 @@ class Phase(object):
 
 class Player(object):
     def __init__(self):
-        self.cards = self.generate_starting_cards()
-        self.victory_points = len(self.cards['victory_cards'])
+        self.deck = self.generate_starting_cards()
+        self.current_hand = []
+        self.discard = []
+        self.victory_points = self.calculate_victory_points()
         self.is_starting = False
 
+    def calculate_victory_points(self):
+        return len(self.get_cards_of_type('victory'))
+
     def generate_starting_cards(self):
-        cards = {}
-        cards['treasure_cards'] = [TreasureCard('Copper') for x in range(7)]
-        cards['victory_cards'] = [VictoryCard('Estate') for x in range(3)]
+        cards = [TreasureCard('Copper') for x in range(7)] + \
+                [VictoryCard('Estate') for x in range(3)]
         return cards
 
-    def get_action_cards(self):
-        try:
-            return self.cards['kingdom_cards']
-        except KeyError:
-            return None
+    def generate_hand(self):
+        hand = []
+        for i in range(5):
+            random_int = random.randint(0, len(self.deck)-1)
+            hand.append(self.deck.pop(random_int))
+        self.current_hand = hand
+
+    def get_cards_of_type(self, card_type):
+        return [card for card in self.deck if card.type == card_type]
 
     def play_card(self, card, turn):
         card.play(turn)

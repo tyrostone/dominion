@@ -63,13 +63,22 @@ class TurnTest(unittest.TestCase):
     def test_first_action_phase_has_no_effect(self):
         player = Player()
         first_turn = Turn(player)
-        self.assertFalse(first_turn.take_phase('action', player))
+        phase = Phase('action', player)
+        self.assertFalse(first_turn.take_phase(phase, player))
 
     def test_action_phase_plays_action_card_if_one_available(self):
         player = Player()
-        player.cards['kingdom_cards'] = [KingdomCard('Village')]
+        player.deck.append(KingdomCard('Village'))
         turn = Turn(player)
-        # self.assert
+        phase = Phase('action', player)
+        self.assertTrue(turn.take_phase(phase, player))
+        # FINISH ME
+
+    def test_action_phase_passes_if_no_action_cards_available(self):
+        player = Player()
+        turn = Turn(player)
+        phase = Phase('action', player)
+        self.assertFalse(turn.take_phase(phase, player))
 
 
 class PlayerTest(unittest.TestCase):
@@ -78,41 +87,44 @@ class PlayerTest(unittest.TestCase):
         player = Player()
         self.assertEqual(3, player.victory_points)
 
-    def test_player_starts_with_ten_total_cards(self):
+    def test_player_starts_with_ten_total_cards_in_deck(self):
         player = Player()
-        treasure_cards = len(player.cards['treasure_cards'])
-        victory_cards = len(player.cards['victory_cards'])
-        self.assertEqual(10, treasure_cards + victory_cards)
+        self.assertEqual(10, len(player.deck))
 
     def test_player_starts_with_seven_treasure_copper_cards(self):
         player = Player()
-        self.assertEqual(7, len([x for x in player.cards['treasure_cards']
-                                 if x.name == 'Copper']))
+        self.assertEqual(7, len(player.get_cards_of_type('treasure')))
 
     def test_player_starts_with_three_victory_estate_cards(self):
         player = Player()
-        self.assertEqual(3, len([x for x in player.cards['victory_cards']
-                                 if x.name == 'Estate']))
+        self.assertEqual(3, len(player.get_cards_of_type('victory')))
+
+    def test_player_starts_with_no_action_cards(self):
+        player = Player()
+        action_cards = player.get_cards_of_type('kingdom')
+        self.assertEqual([], action_cards)
 
     def test_player_starts_not_as_starting_player(self):
         player = Player()
         self.assertFalse(player.is_starting)
 
-    def test_player_starts_with_no_action_cards(self):
-        player = Player()
-        action_cards = player.get_action_cards()
-        self.assertIsNone(action_cards)
-
     def test_player_returns_action_card_if_one_available(self):
         player = Player()
-        player.cards['kingdom_cards'] = [KingdomCard('Village')]
-        self.assertIsInstance(player.get_action_cards()[0], KingdomCard)
+        player.deck.append(KingdomCard('Village'))
+        self.assertIsInstance(
+            player.get_cards_of_type('kingdom')[0], KingdomCard)
 
     def test_player_can_play_card(self):
         player = Player()
         turn = Turn(player)
-        player.cards['kingdom_cards'] = [KingdomCard('Village')]
-        player.play_card(player.get_action_cards()[0], turn)
+        player.deck.append(KingdomCard('Village'))
+        player.play_card(player.get_cards_of_type('kingdom')[0], turn)
+
+    def test_player_generates_hand_of_five_cards(self):
+        player = Player()
+        player.generate_hand()
+        self.assertEqual(5, len(player.current_hand))
+
 
 class BoardTest(unittest.TestCase):
 
