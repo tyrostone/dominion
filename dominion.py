@@ -48,17 +48,26 @@ class Turn(object):
         self.player = player
         self.phases = [Phase('action', self.player), Phase('buy', self.player),
                        Phase('cleanup', self.player)]
-        self.take_phase(self.phases[0], self.player)
+
+        for phase in self.phases:
+            outcome = self.take_phase(phase, self.player)
 
     def take_phase(self, phase, player):
-        pass
+        if phase == 'action':
+            action_cards = player.get_action_cards()
+            if action_cards:
+                if len(action_cards) == 1:
+                    player.play_card(action_cards[0])
+                else:
+                    pass
+            else:
+                return False
 
 
 class Phase(object):
     def __init__(self, phase_type, player):
         self.player = player
         self.type = phase_type
-        pass
 
 
 class Player(object):
@@ -72,6 +81,15 @@ class Player(object):
         cards['treasure_cards'] = [TreasureCard('Copper') for x in range(7)]
         cards['victory_cards'] = [VictoryCard('Estate') for x in range(3)]
         return cards
+
+    def get_action_cards(self):
+        try:
+            return self.cards['kingdom_cards']
+        except KeyError:
+            return None
+
+    def play_card(self, card):
+        card.play()
 
 
 class Board(object):
@@ -134,6 +152,9 @@ class Card(object):
                     return card.values()[0][info]
                 except KeyError:
                     return None
+
+    def play(self):
+        pass
 
 
 class KingdomCard(Card):

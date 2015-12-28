@@ -50,6 +50,17 @@ class TurnTest(unittest.TestCase):
         turn = Turn(player)
         self.assertEqual('action', turn.phases[0].type)
 
+    def test_first_action_phase_has_no_effect(self):
+        player = Player()
+        first_turn = Turn(player)
+        self.assertFalse(first_turn.take_phase('action', player))
+
+    def test_action_phase_plays_action_card_if_one_available(self):
+        player = Player()
+        player.cards['kingdom_cards'] = [KingdomCard('Village')]
+        turn = Turn(player)
+        # self.assert
+
 
 class PlayerTest(unittest.TestCase):
 
@@ -77,6 +88,20 @@ class PlayerTest(unittest.TestCase):
         player = Player()
         self.assertFalse(player.is_starting)
 
+    def test_player_starts_with_no_action_cards(self):
+        player = Player()
+        action_cards = player.get_action_cards()
+        self.assertIsNone(action_cards)
+
+    def test_player_returns_action_card_if_one_available(self):
+        player = Player()
+        player.cards['kingdom_cards'] = [KingdomCard('Village')]
+        self.assertIsInstance(player.get_action_cards()[0], KingdomCard)
+
+    def test_player_can_play_card(self):
+        player = Player()
+        player.cards['kingdom_cards'] = [KingdomCard('Village')]
+        player.play_card(player.get_action_cards()[0])
 
 class BoardTest(unittest.TestCase):
 
