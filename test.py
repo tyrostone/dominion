@@ -40,6 +40,16 @@ class DominionTest(unittest.TestCase):
 
 class TurnTest(unittest.TestCase):
 
+    def test_turn_starts_with_one_action(self):
+        player = Player()
+        turn = Turn(player)
+        self.assertEqual(1, turn.actions)
+
+    def test_turn_starts_with_one_buy(self):
+        player = Player()
+        turn = Turn(player)
+        self.assertEqual(1, turn.buys)
+
     def test_turn_has_three_phases(self):
         player = Player()
         turn = Turn(player)
@@ -100,8 +110,9 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_can_play_card(self):
         player = Player()
+        turn = Turn(player)
         player.cards['kingdom_cards'] = [KingdomCard('Village')]
-        player.play_card(player.get_action_cards()[0])
+        player.play_card(player.get_action_cards()[0], turn)
 
 class BoardTest(unittest.TestCase):
 
@@ -153,6 +164,41 @@ class KingdomCardTest(unittest.TestCase):
     def test_kingdom_card_woodcutter_has_value(self):
         card = KingdomCard('Woodcutter')
         self.assertEqual(2, card.value)
+
+    def test_kingdom_card_village_has_two_actions(self):
+        card = KingdomCard('Village')
+        self.assertEqual(2, card.actions)
+
+    def test_kingom_card_village_has_actions_attribute(self):
+        card = KingdomCard('Village')
+        self.assertEqual(2, card.actions)
+
+    def test_kingom_card_woodcutter_has_no_actions_attribute(self):
+        card = KingdomCard('Woodcutter')
+        self.assertIsNone(card.actions)
+
+    def test_kingdom_card_woodcutter_has_buys_attribute(self):
+        card = KingdomCard('Woodcutter')
+        self.assertEqual(1, card.buys)
+
+    def test_kingom_card_village_has_no_buys_attribute(self):
+        card = KingdomCard('Village')
+        self.assertIsNone(card.buys)
+
+    def test_playing_kingdom_card_village_adds_two_actions_to_turn(self):
+        player = Player()
+        turn = Turn(player)
+        card = KingdomCard('Village')
+        card.play(turn)
+        self.assertEqual(3, turn.actions)
+
+    def test_playing_kingdom_card_woodcutter_adds_no_actions_to_turn(self):
+        player = Player()
+        turn = Turn(player)
+        card = KingdomCard('Woodcutter')
+        card.play(turn)
+        self.assertEqual(1, turn.actions)
+
 
 if __name__ == '__main__':
     unittest.main()

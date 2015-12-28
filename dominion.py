@@ -45,6 +45,8 @@ class Dominion(object):
 
 class Turn(object):
     def __init__(self, player):
+        self.actions = 1
+        self.buys = 1
         self.player = player
         self.phases = [Phase('action', self.player), Phase('buy', self.player),
                        Phase('cleanup', self.player)]
@@ -57,7 +59,7 @@ class Turn(object):
             action_cards = player.get_action_cards()
             if action_cards:
                 if len(action_cards) == 1:
-                    player.play_card(action_cards[0])
+                    player.play_card(action_cards[0], self)
                 else:
                     pass
             else:
@@ -88,8 +90,10 @@ class Player(object):
         except KeyError:
             return None
 
-    def play_card(self, card):
-        card.play()
+    def play_card(self, card, turn):
+        card.play(turn)
+        if card.type == 'kingdom':
+            turn.actions -= 1
 
 
 class Board(object):
@@ -134,12 +138,13 @@ class Card(object):
         card_types_list = ['kingdom', 'treasure', 'victory']
         self.name = name
         self.type = card_type if card_type in card_types_list else None
-        self.value = self.set_card_attribute(
-            name, card_type, 'value')
-        self.cost = self.set_card_attribute(
-            name, card_type, 'cost')
+        self.value = self.set_card_attribute(name, card_type, 'value')
+        self.cost = self.set_card_attribute(name, card_type, 'cost')
         self.victory_points = self.set_card_attribute(
             name, card_type, 'victory_points')
+        self.actions = self.set_card_attribute(name, card_type, 'add_actions')
+        self.cards = self.set_card_attribute(name, card_type, 'add_cards')
+        self.buys = self.set_card_attribute(name, card_type, 'add_buys')
 
     def set_card_attribute(self, name, card_type, attribute):
         return None if name is None else self.get_card_info_from_name(
@@ -153,8 +158,15 @@ class Card(object):
                 except KeyError:
                     return None
 
-    def play(self):
-        pass
+    def play(self, turn):
+        actions = ['actions', 'buys', 'cards']
+        for action in actions:
+            if action == 'cards':
+                continue
+            if getattr(self, action) is not None:
+                value = getattr(turn, action)
+                value += getattr(self, action)
+                setattr(turn, action, value)
 
 
 class KingdomCard(Card):

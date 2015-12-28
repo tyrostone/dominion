@@ -14,7 +14,7 @@ card_types = \
       {'Chancellor':   {'cost': 3, 'value': 2,
                         'action': 'deck into discard'}},
       {'Village':      {'cost': 3, 'add_actions': 2, 'add_cards': 1}},
-      {'Woodcutter':   {'cost': 3, 'value': 2, 'add_buy': 1}},
+      {'Woodcutter':   {'cost': 3, 'value': 2, 'add_buys': 1}},
       {'Workshop':     {'cost': 3, 'gain_card': True, 'gain_card_limit': 4}},
       {'Feast':        {'cost': 4, 'gain_card': True, 'gain_card_limit': 5,
                         'trash': True}},
