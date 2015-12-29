@@ -54,20 +54,24 @@ class Turn(object):
         #for phase in self.phases:
         #    outcome = self.take_phase(phase, self.player)
 
-    def take_phase(self, phase, player):
+    def take_phase(self, phase):
         if phase.type == 'action':
+            actions_taken = 0
             available_actions = self.actions
             while available_actions > 0:
-                action_cards = player.get_cards_of_type('kingdom')
+                action_cards = [card for card in self.player.current_hand
+                                if card.type == 'kingdom']
+                if not action_cards:
+                    break
                 if action_cards:
+                    actions_taken += 1
                     if len(action_cards) == 1:
-                        player.play_card(action_cards[0], self)
-                        available_actions = 0  # Otherwise we infinite loop
+                        self.player.play_card(action_cards[0], self)
                     else:
                         pass
-                else:
-                    return False
+        if actions_taken > 0:
             return True
+        return False
 
 
 class Phase(object):

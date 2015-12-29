@@ -65,21 +65,21 @@ class TurnTest(unittest.TestCase):
         player = Player()
         first_turn = Turn(player)
         phase = Phase('action', player)
-        self.assertFalse(first_turn.take_phase(phase, player))
+        self.assertFalse(first_turn.take_phase(phase))
 
     def test_action_phase_plays_action_card_if_one_available(self):
         player = Player()
+        player.generate_hand()
         player.current_hand.append(KingdomCard('Village'))
         turn = Turn(player)
         phase = Phase('action', player)
-        self.assertTrue(turn.take_phase(phase, player))
-        # FINISH ME
+        self.assertTrue(turn.take_phase(phase))
 
     def test_action_phase_passes_if_no_action_cards_available(self):
         player = Player()
         turn = Turn(player)
         phase = Phase('action', player)
-        self.assertFalse(turn.take_phase(phase, player))
+        self.assertFalse(turn.take_phase(phase))
 
 
 class PlayerTest(unittest.TestCase):
