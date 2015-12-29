@@ -22,6 +22,10 @@ class DominionTest(unittest.TestCase):
         game.run()
         self.assertEqual(2, len(game.players))
 
+    def test_game_cannot_have_more_than_four_players(self):
+        game = Dominion(20)
+        self.assertEqual(4, len(game.players))
+
     def test_game_players_type_is_player_object(self):
         game = Dominion()
         game.run()

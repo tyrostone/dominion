@@ -5,7 +5,7 @@ from card_types import card_types
 
 class Dominion(object):
     def __init__(self, players=2):
-        self.players = self.generate_players(players)
+        self.players = self.check_and_generate_players(players)
         self.board = self.generate_board()
 
     def run(self):
@@ -15,6 +15,11 @@ class Dominion(object):
 
     def generate_board(self):
         return Board(len(self.players))
+
+    def check_and_generate_players(self, players):
+        if players > 4:
+            players = 4
+        return self.generate_players(players)
 
     def generate_players(self, players):
         players_list = []
