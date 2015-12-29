@@ -149,7 +149,7 @@ class Board(object):
                 Slot(TreasureCard('Gold'))]
 
     def generate_victory_slots(self):
-        return [Slot(VictoryCard('Estate'), self.num_players),
+        return [Slot(VictoryCard('Estate')),
                 Slot(VictoryCard('Duchy')),
                 Slot(VictoryCard('Province'))]
 
