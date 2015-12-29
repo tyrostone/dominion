@@ -105,6 +105,21 @@ class TurnTest(unittest.TestCase):
         phase = Phase('buy', player)
         self.assertTrue(turn.take_phase(phase))
 
+    def test_buy_phase_adds_card_to_player_discard(self):
+        player = Player()
+        board = Board()
+        turn = Turn(player, board)
+        phase = Phase('buy', player)
+        turn.take_phase(phase)
+        self.assertEqual(1, len(player.discard))
+
+    def test_buy_phase_removes_card_from_board(self):
+        player = Player()
+        board = Board()
+        turn = Turn(player, board)
+        phase = Phase('buy', player)
+        turn.take_phase(phase)
+        self.assertEqual(9, board.slots[0].num_cards)
 
 class PlayerTest(unittest.TestCase):
 

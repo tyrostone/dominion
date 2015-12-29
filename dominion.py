@@ -82,7 +82,12 @@ class Turn(object):
         if phase.type == 'buy':
             while self.buys > 0:
                 available_cards = self.board.display_cards()
-                self.player.buy_card(available_cards[0])
+                purchase = available_cards[0]
+                purchase_slot = [slot for slot in self.board.slots
+                                 if slot.card == purchase][0]
+                index = self.board.slots.index(purchase_slot)
+                self.board.slots[index].num_cards -= 1
+                self.player.buy_card(purchase)
                 self.buys -= 1
             return True
 
@@ -139,6 +144,9 @@ class Player(object):
     def buy_card(self, card):
         self.discard.append(card)
 
+    def determine_purchase(self, options):
+        return options[0]
+
 
 class Board(object):
     def __init__(self, num_players=2):
@@ -146,6 +154,7 @@ class Board(object):
         self.kingdom_slots = self.generate_and_check_kingdom_slots()
         self.treasure_slots = self.generate_treasure_slots()
         self.victory_slots = self.generate_victory_slots()
+        self.slots = self.kingdom_slots + self.treasure_slots + self.victory_slots
         self.trash = []
 
     def generate_and_check_kingdom_slots(self):
@@ -176,9 +185,7 @@ class Board(object):
         return True
 
     def display_cards(self):
-        all_slots = self.kingdom_slots + self.treasure_slots + \
-            self.victory_slots
-        return [slot.card for slot in all_slots]
+        return [slot.card for slot in self.slots]
 
 
 class Slot(object):
