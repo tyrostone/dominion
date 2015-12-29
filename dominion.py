@@ -82,7 +82,7 @@ class Turn(object):
         if phase.type == 'buy':
             while self.buys > 0:
                 available_cards = self.board.display_cards()
-                purchase = available_cards[0]
+                purchase = self.player.determine_purchase(available_cards)
                 purchase_slot = [slot for slot in self.board.slots
                                  if slot.card == purchase][0]
                 index = self.board.slots.index(purchase_slot)
