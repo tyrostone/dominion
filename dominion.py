@@ -51,6 +51,7 @@ class Turn(object):
         self.phases = [Phase('action', self.player), Phase('buy', self.player),
                        Phase('cleanup', self.player)]
 
+        # TODO: Implement phase logic
         #for phase in self.phases:
         #    outcome = self.take_phase(phase, self.player)
 
@@ -228,11 +229,23 @@ class Card(object):
         actions = ['actions', 'buys', 'cards']
         for action in actions:
             if action == 'cards':
-                continue
-            if getattr(self, action) is not None:
-                value = getattr(turn, action)
-                value += getattr(self, action)
-                setattr(turn, action, value)
+                self.play_adds_cards(turn)
+            elif getattr(self, action) is not None:
+                self.play_sets_turn_attr(turn, action)
+
+    def play_adds_cards(self, turn):
+        try:
+            value = getattr(self, 'cards')
+            for i in range(value):
+                card = turn.player.deck.pop(-1)
+                turn.player.current_hand.append(card)
+        except TypeError:
+            pass
+
+    def play_sets_turn_attr(self, turn, action):
+        value = getattr(turn, action)
+        value += getattr(self, action)
+        setattr(turn, action, value)
 
 
 class KingdomCard(Card):

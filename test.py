@@ -299,6 +299,26 @@ class KingdomCardTest(unittest.TestCase):
         card.play(turn)
         self.assertEqual(1, turn.actions)
 
+    def test_playing_kingdom_card_village_adds_card_to_hand(self):
+        player = Player()
+        turn = Turn(player)
+        card = KingdomCard('Village')
+        card.play(turn)
+        self.assertEqual(1, len(turn.player.current_hand))
+
+    def test_playing_kingdom_card_smithy_adds_three_cards_to_hand(self):
+        player = Player()
+        turn = Turn(player)
+        card = KingdomCard('Smithy')
+        card.play(turn)
+        self.assertEqual(3, len(turn.player.current_hand))
+
+    def test_playing_kingdom_card_woodcutter_adds_no_cards_to_hand(self):
+        player = Player()
+        turn = Turn(player)
+        card = KingdomCard('Woodcutter')
+        card.play(turn)
+        self.assertEqual(0, len(turn.player.current_hand))
 
 if __name__ == '__main__':
     unittest.main()
