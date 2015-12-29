@@ -90,6 +90,8 @@ class Turn(object):
                 self.player.buy_card(purchase)
                 self.buys -= 1
             return True
+        if phase.type == 'cleanup':
+            pass
 
 
 class Phase(object):
@@ -146,7 +148,26 @@ class Player(object):
         self.discard.append(card)
 
     def determine_purchase(self, options):
-        return options[0]
+        coins = self.count_coins_in_hand()
+        affordable_options = self.determine_affordable_options(options, coins)
+        if len(affordable_options) == 1:
+            return affordable_options[0]
+
+    def count_coins_in_hand(self):
+        count = 0
+        for value in [x.value for x in self.current_hand]:
+            try:
+                count += value
+            except TypeError:
+                continue
+        return count
+
+    def determine_affordable_options(self, options, coins):
+        affordable = []
+        for option in options:
+            if option.cost <= coins:
+                affordable.append(option)
+        return affordable
 
     def trash(self, card):
         card = self.current_hand.pop(self.current_hand.index(card))

@@ -87,9 +87,10 @@ class TurnTest(unittest.TestCase):
         self.assertEqual(1, len(self.player.discard))
 
     def test_buy_phase_removes_card_from_board(self):
+        self.board.slots = [Slot(TreasureCard('Copper'))]
         phase = Phase('buy', self.player)
         self.turn.take_phase(phase)
-        self.assertEqual(9, self.board.slots[0].num_cards)
+        self.assertEqual(45, self.board.slots[0].num_cards)
 
 
 class PlayerTest(unittest.TestCase):
@@ -175,6 +176,23 @@ class PlayerTest(unittest.TestCase):
                   if card.name == 'Copper'][0]
         self.player.trash(copper)
         self.assertIn(copper, self.player.board.trash)
+
+    def test_player_can_count_coins_in_current_hand(self):
+        self.player.current_hand = [TreasureCard('Copper'),
+                                    TreasureCard('Copper'),
+                                    TreasureCard('Copper'),
+                                    TreasureCard('Copper')]
+        self.assertEqual(len(self.player.current_hand),
+                         self.player.count_coins_in_hand())
+
+    def test_player_chooses_purchase_if_one_option_available(self):
+        self.board.slots = [Slot(KingdomCard('Village'))]
+        self.player.current_hand = [TreasureCard('Copper'),
+                                    TreasureCard('Copper'),
+                                    TreasureCard('Copper'),
+                                    TreasureCard('Copper')]
+        self.assertIsInstance(self.player.determine_purchase(
+                             self.board.display_cards()), KingdomCard)
 
 
 class BoardTest(unittest.TestCase):
