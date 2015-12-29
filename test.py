@@ -191,6 +191,10 @@ class BoardTest(unittest.TestCase):
         card_names_set = set(card_names)
         self.assertEqual(len(card_names_set), len(card_names))
 
+    def test_board_has_trash_pile(self):
+        board = Board()
+        self.assertEqual([], board.trash)
+
 
 class SlotTest(unittest.TestCase):
 

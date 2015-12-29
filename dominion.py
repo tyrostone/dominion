@@ -130,6 +130,7 @@ class Board(object):
         self.kingdom_slots = self.generate_and_check_kingdom_slots()
         self.treasure_slots = self.generate_treasure_slots()
         self.victory_slots = self.generate_victory_slots()
+        self.trash = []
 
     def generate_and_check_kingdom_slots(self):
         slots = []
