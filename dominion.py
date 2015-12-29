@@ -10,7 +10,7 @@ class Dominion(object):
 
     def run(self):
         self.starting_player = self.determine_player_order()
-        current_turn = Turn(self.starting_player)
+        current_turn = Turn(self.starting_player, self.board)
         return current_turn
 
     def generate_board(self):
@@ -44,10 +44,11 @@ class Dominion(object):
 
 
 class Turn(object):
-    def __init__(self, player):
+    def __init__(self, player, board):
+        self.board = board
+        self.player = player
         self.actions = 1
         self.buys = 1
-        self.player = player
         self.phases = [Phase('action', self.player), Phase('buy', self.player),
                        Phase('cleanup', self.player)]
 
@@ -70,9 +71,15 @@ class Turn(object):
                         self.player.play_card(action_cards[0], self)
                     else:
                         pass
-        if actions_taken > 0:
+            if actions_taken > 0:
+                return True
+            return False
+        if phase.type == 'buy':
+            while self.buys > 0:
+                available_cards = self.board.display_cards()
+                self.player.buy_card(available_cards[0])
+                self.buys -= 1
             return True
-        return False
 
 
 class Phase(object):
@@ -124,6 +131,9 @@ class Player(object):
         else:
             raise Exception
 
+    def buy_card(self, card):
+        self.discard.append(card)
+
 
 class Board(object):
     def __init__(self, num_players=2):
@@ -159,6 +169,11 @@ class Board(object):
             if s.card.name == slot.card.name:
                 return False
         return True
+
+    def display_cards(self):
+        all_slots = self.kingdom_slots + self.treasure_slots + \
+            self.victory_slots
+        return [slot.card for slot in all_slots]
 
 
 class Slot(object):

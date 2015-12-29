@@ -44,43 +44,62 @@ class TurnTest(unittest.TestCase):
 
     def test_turn_starts_with_one_action(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         self.assertEqual(1, turn.actions)
 
     def test_turn_starts_with_one_buy(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         self.assertEqual(1, turn.buys)
 
     def test_turn_has_three_phases(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         self.assertEqual(3, len(turn.phases))
 
     def test_turn_first_phase_is_action(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         self.assertEqual('action', turn.phases[0].type)
 
-    def test_first_action_phase_has_no_effect(self):
+    def test_turn_second_phase_is_buy(self):
         player = Player()
-        first_turn = Turn(player)
-        phase = Phase('action', player)
-        self.assertFalse(first_turn.take_phase(phase))
+        board = Board()
+        turn = Turn(player, board)
+        self.assertEqual('buy', turn.phases[1].type)
+
+    def test_turn_third_phase_is_cleanup(self):
+        player = Player()
+        board = Board()
+        turn = Turn(player, board)
+        self.assertEqual('cleanup', turn.phases[-1].type)
 
     def test_action_phase_plays_action_card_if_one_available(self):
         player = Player()
+        board = Board()
         player.generate_hand()
         player.current_hand.append(KingdomCard('Village'))
-        turn = Turn(player)
+        turn = Turn(player, board)
         phase = Phase('action', player)
         self.assertTrue(turn.take_phase(phase))
 
     def test_action_phase_passes_if_no_action_cards_available(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         phase = Phase('action', player)
         self.assertFalse(turn.take_phase(phase))
+
+    def test_buy_phase_exists(self):
+        player = Player()
+        board = Board()
+        turn = Turn(player, board)
+        phase = Phase('buy', player)
+        self.assertTrue(turn.take_phase(phase))
 
 
 class PlayerTest(unittest.TestCase):
@@ -118,13 +137,15 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_can_play_card_in_hand(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         player.current_hand.append(KingdomCard('Village'))
         player.play_card(player.current_hand[0], turn)
 
     def test_player_cannot_play_card_not_in_hand(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         player.generate_hand()
         deck_card = KingdomCard('Village')
         player.deck.append(deck_card)
@@ -160,11 +181,18 @@ class PlayerTest(unittest.TestCase):
 
     def test_player_discards_card_after_playing_it(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         player.generate_hand()
         card_to_play = player.current_hand[0]
         player.play_card(player.current_hand[0], turn)
         self.assertIn(card_to_play, player.discard)
+
+    def test_player_can_buy_copper_treasure_card(self):
+        player = Player()
+        card = TreasureCard('Copper')
+        player.buy_card(card)
+        self.assertIn(card, player.discard)
 
 
 class BoardTest(unittest.TestCase):
@@ -194,6 +222,12 @@ class BoardTest(unittest.TestCase):
     def test_board_has_trash_pile(self):
         board = Board()
         self.assertEqual([], board.trash)
+
+    def test_board_displays_available_cards(self):
+        board = Board()
+        all_cards = board.display_cards()
+        for card in all_cards:
+            self.assertIsInstance(card, Card)
 
 
 class SlotTest(unittest.TestCase):
@@ -287,35 +321,40 @@ class KingdomCardTest(unittest.TestCase):
 
     def test_playing_kingdom_card_village_adds_two_actions_to_turn(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         card = KingdomCard('Village')
         card.play(turn)
         self.assertEqual(3, turn.actions)
 
     def test_playing_kingdom_card_woodcutter_adds_no_actions_to_turn(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         card = KingdomCard('Woodcutter')
         card.play(turn)
         self.assertEqual(1, turn.actions)
 
     def test_playing_kingdom_card_village_adds_card_to_hand(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         card = KingdomCard('Village')
         card.play(turn)
         self.assertEqual(1, len(turn.player.current_hand))
 
     def test_playing_kingdom_card_smithy_adds_three_cards_to_hand(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         card = KingdomCard('Smithy')
         card.play(turn)
         self.assertEqual(3, len(turn.player.current_hand))
 
     def test_playing_kingdom_card_woodcutter_adds_no_cards_to_hand(self):
         player = Player()
-        turn = Turn(player)
+        board = Board()
+        turn = Turn(player, board)
         card = KingdomCard('Woodcutter')
         card.play(turn)
         self.assertEqual(0, len(turn.player.current_hand))
