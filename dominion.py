@@ -99,6 +99,11 @@ class Player(object):
             hand.append(self.deck.pop(random_int))
         self.current_hand = hand
 
+    def discard_hand(self):
+        for i in range(len(self.current_hand)):
+            card = self.current_hand.pop(0)
+            self.discard.append(card)
+
     def get_cards_of_type(self, card_type):
         return [card for card in self.deck if card.type == card_type]
 

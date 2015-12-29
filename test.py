@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 from dominion import Board, Card, Dominion, KingdomCard, Phase, Player, Slot, Turn
@@ -124,6 +125,29 @@ class PlayerTest(unittest.TestCase):
         player = Player()
         player.generate_hand()
         self.assertEqual(5, len(player.current_hand))
+
+    def test_player_cards_in_hand_not_in_deck(self):
+        player = Player()
+        player.generate_hand()
+        for card in player.current_hand:
+            self.assertNotIn(card, player.deck)
+
+    def test_player_discard_starts_empty(self):
+        player = Player()
+        self.assertEqual([], player.discard)
+
+    def test_player_discard_hand_empties_hand(self):
+        player = Player()
+        player.generate_hand()
+        player.discard_hand()
+        self.assertEqual([], player.current_hand)
+
+    def test_player_discard_hand_goes_to_discard(self):
+        player = Player()
+        player.generate_hand()
+        hand = copy.copy(player.current_hand)
+        player.discard_hand()
+        self.assertEqual(hand, player.discard)
 
 
 class BoardTest(unittest.TestCase):
