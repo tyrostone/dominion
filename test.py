@@ -69,7 +69,7 @@ class TurnTest(unittest.TestCase):
 
     def test_action_phase_plays_action_card_if_one_available(self):
         player = Player()
-        player.deck.append(KingdomCard('Village'))
+        player.current_hand.append(KingdomCard('Village'))
         turn = Turn(player)
         phase = Phase('action', player)
         self.assertTrue(turn.take_phase(phase, player))
@@ -115,11 +115,19 @@ class PlayerTest(unittest.TestCase):
         self.assertIsInstance(
             player.get_cards_of_type('kingdom')[0], KingdomCard)
 
-    def test_player_can_play_card(self):
+    def test_player_can_play_card_in_hand(self):
         player = Player()
         turn = Turn(player)
-        player.deck.append(KingdomCard('Village'))
-        player.play_card(player.get_cards_of_type('kingdom')[0], turn)
+        player.current_hand.append(KingdomCard('Village'))
+        player.play_card(player.current_hand[0], turn)
+
+    def test_player_cannot_play_card_not_in_hand(self):
+        player = Player()
+        turn = Turn(player)
+        player.generate_hand()
+        deck_card = KingdomCard('Village')
+        player.deck.append(deck_card)
+        self.assertRaises(Exception, player.play_card, deck_card, turn)
 
     def test_player_generates_hand_of_five_cards(self):
         player = Player()
@@ -148,6 +156,14 @@ class PlayerTest(unittest.TestCase):
         hand = copy.copy(player.current_hand)
         player.discard_hand()
         self.assertEqual(hand, player.discard)
+
+    def test_player_discards_card_after_playing_it(self):
+        player = Player()
+        turn = Turn(player)
+        player.generate_hand()
+        card_to_play = player.current_hand[0]
+        player.play_card(player.current_hand[0], turn)
+        self.assertIn(card_to_play, player.discard)
 
 
 class BoardTest(unittest.TestCase):

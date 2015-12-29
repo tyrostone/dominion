@@ -105,12 +105,19 @@ class Player(object):
             self.discard.append(card)
 
     def get_cards_of_type(self, card_type):
-        return [card for card in self.deck if card.type == card_type]
+        return [card for card in self.deck if card.type == card_type] + \
+               [card for card in self.current_hand if card.type == card_type] + \
+               [card for card in self.discard if card.type == card_type]
 
     def play_card(self, card, turn):
-        card.play(turn)
-        if card.type == 'kingdom':
-            turn.actions -= 1
+        if card in self.current_hand:
+            card.play(turn)
+            if card.type == 'kingdom':
+                turn.actions -= 1
+            self.discard.append(self.current_hand.pop(
+                self.current_hand.index(card)))
+        else:
+            raise Exception
 
 
 class Board(object):
