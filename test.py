@@ -1,7 +1,8 @@
 import copy
 import unittest
 
-from dominion import Board, Card, Dominion, KingdomCard, Phase, Player, Slot, Turn
+from dominion import Board, Card, Dominion, Phase, Player, Slot, Turn
+from dominion import KingdomCard, TreasureCard, VictoryCard
 
 
 class DominionTest(unittest.TestCase):
@@ -168,13 +169,25 @@ class PlayerTest(unittest.TestCase):
 
 class BoardTest(unittest.TestCase):
 
-    def test_board_has_ten_slots_for_card_sets(self):
+    def test_board_defaults_to_two_players(self):
         board = Board()
-        self.assertEqual(10, len(board.slots))
+        self.assertEqual(2, board.num_players)
 
-    def test_cards_in_board_slots_are_unique_to_board(self):
+    def test_board_has_ten_slots_for_kingdom_cards(self):
         board = Board()
-        card_names = [x.card.name for x in board.slots]
+        self.assertEqual(10, len(board.kingdom_slots))
+
+    def test_board_has_three_treasure_card_slots(self):
+        board = Board()
+        self.assertEqual(3, len(board.treasure_slots))
+
+    def test_board_has_three_victory_card_slots(self):
+        board = Board()
+        self.assertEqual(3, len(board.victory_slots))
+
+    def test_kingdom_cards_in_board_slots_are_unique_to_board(self):
+        board = Board()
+        card_names = [x.card.name for x in board.kingdom_slots]
         card_names_set = set(card_names)
         self.assertEqual(len(card_names_set), len(card_names))
 
@@ -185,14 +198,45 @@ class SlotTest(unittest.TestCase):
         slot = Slot()
         self.assertIsInstance(slot.card, Card)
 
-    def test_board_slot_card_type_is_kingdom(self):
+    def test_board_slot_default_card_type_is_kingdom(self):
         slot = Slot()
         self.assertEqual('kingdom', slot.card.type)
 
-    def test_board_slot_name_generation_returns_string(self):
+    def test_board_treasure_slot_copper_has_card_type_treasure(self):
+        slot = Slot(TreasureCard('Copper'))
+        self.assertEqual('treasure', slot.card.type)
+
+    def test_board_victory_slot_estate_has_card_type_treasure(self):
+        slot = Slot(VictoryCard('Estate'))
+        self.assertEqual('victory', slot.card.type)
+
+    def test_board_slot_has_ten_cards_of_card_type_kingdom(self):
         slot = Slot()
-        string = 'example string'
-        self.assertEqual(type(slot.card.name), type(string))
+        self.assertEqual(10, slot.num_cards)
+
+    def test_board_slot_has_forty_six_copper_cards_by_default(self):
+        slot = Slot(TreasureCard('Copper'))
+        self.assertEqual(46, slot.num_cards)
+
+    def test_board_slot_has_thirty_nine_copper_cards_if_three_players(self):
+        slot = Slot(TreasureCard('Copper'), 3)
+        self.assertEqual(39, slot.num_cards)
+
+    def test_board_slot_has_forty_silver_cards(self):
+        slot = Slot(TreasureCard('Silver'))
+        self.assertEqual(40, slot.num_cards)
+
+    def test_board_slot_has_thirty_gold_cards(self):
+        slot = Slot(TreasureCard('Gold'))
+        self.assertEqual(30, slot.num_cards)
+
+    def test_board_slot_has_eight_victory_cards_by_default(self):
+        slot = Slot(VictoryCard('Estate'))
+        self.assertEqual(8, slot.num_cards)
+
+    def test_board_slot_has_twelve_victory_cards_if_three_players(self):
+        slot = Slot(VictoryCard('Estate'), 3)
+        self.assertEqual(12, slot.num_cards)
 
 
 class KingdomCardTest(unittest.TestCase):

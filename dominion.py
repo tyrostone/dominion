@@ -14,7 +14,7 @@ class Dominion(object):
         return current_turn
 
     def generate_board(self):
-        return Board()
+        return Board(len(self.players))
 
     def generate_players(self, players):
         players_list = []
@@ -125,10 +125,13 @@ class Player(object):
 
 
 class Board(object):
-    def __init__(self):
-        self.slots = self.generate_and_check_slots()
+    def __init__(self, num_players=2):
+        self.num_players = num_players
+        self.kingdom_slots = self.generate_and_check_kingdom_slots()
+        self.treasure_slots = self.generate_treasure_slots()
+        self.victory_slots = self.generate_victory_slots()
 
-    def generate_and_check_slots(self):
+    def generate_and_check_kingdom_slots(self):
         slots = []
         for x in range(10):
             new_slot_is_unique = False
@@ -139,6 +142,16 @@ class Board(object):
             slots.append(new_slot)
         return slots
 
+    def generate_treasure_slots(self):
+        return [Slot(TreasureCard('Copper'), self.num_players),
+                Slot(TreasureCard('Silver')),
+                Slot(TreasureCard('Gold'))]
+
+    def generate_victory_slots(self):
+        return [Slot(VictoryCard('Estate'), self.num_players),
+                Slot(VictoryCard('Duchy')),
+                Slot(VictoryCard('Province'))]
+
     def check_slot_card_is_unique(self, current_slot_list, slot):
         for s in current_slot_list:
             if s.card.name == slot.card.name:
@@ -147,9 +160,10 @@ class Board(object):
 
 
 class Slot(object):
-    def __init__(self, card=None):
-        self.num_cards = 10
+    def __init__(self, card=None, num_players=2):
+        self.num_players = num_players
         self.card = card if card is not None else self.generate_card()
+        self.num_cards = self.generate_num_cards()
 
     def generate_card(self):
         card_name = self.generate_random_card_name()
@@ -159,6 +173,29 @@ class Slot(object):
         names = card_types['kingdom']
         random_int = random.randint(0, len(names)-1)
         return names[random_int].keys()[0]
+
+    def generate_num_cards(self):
+        if self.card.type == 'kingdom':
+            return 10
+        elif self.card.type == 'treasure':
+            cards = {'Copper': 60, 'Silver': 40, 'Gold': 30}
+            return self.calculate_treasure_card_number(cards)
+        elif self.card.type == 'victory':
+            return self.calculate_victory_card_number()
+
+    def calculate_treasure_card_number(self, cards):
+        for key in cards:
+            if self.card.name == key:
+                if key == 'Copper':
+                    return cards[key] - (7 * self.num_players)
+                else:
+                    return cards[key]
+
+    def calculate_victory_card_number(self):
+        if self.num_players > 2:
+            return 12
+        else:
+            return 8
 
 
 class Card(object):
