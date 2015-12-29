@@ -5,16 +5,16 @@ from card_types import card_types
 
 class Dominion(object):
     def __init__(self, players=2):
+        self.board = self.generate_board(players)
         self.players = self.check_and_generate_players(players)
-        self.board = self.generate_board()
 
     def run(self):
         self.starting_player = self.determine_player_order()
         current_turn = Turn(self.starting_player, self.board)
         return current_turn
 
-    def generate_board(self):
-        return Board(len(self.players))
+    def generate_board(self, players):
+        return Board(players)
 
     def check_and_generate_players(self, players):
         if players > 4:
@@ -24,7 +24,7 @@ class Dominion(object):
     def generate_players(self, players):
         players_list = []
         for player in range(players):
-            players_list.append(Player())
+            players_list.append(Player(self.board))
         return players_list
 
     def determine_player_order(self):
@@ -99,7 +99,8 @@ class Phase(object):
 
 
 class Player(object):
-    def __init__(self):
+    def __init__(self, board):
+        self.board = board
         self.deck = self.generate_starting_cards()
         self.current_hand = []
         self.discard = []
@@ -146,6 +147,10 @@ class Player(object):
 
     def determine_purchase(self, options):
         return options[0]
+
+    def trash(self, card):
+        card = self.current_hand.pop(self.current_hand.index(card))
+        self.board.trash.append(card)
 
 
 class Board(object):
