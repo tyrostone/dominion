@@ -282,11 +282,11 @@ class Card(object):
         actions = ['actions', 'buys', 'cards']
         for action in actions:
             if action == 'cards':
-                self.play_adds_cards_to_current_hand(turn)
+                self.add_cards_to_current_hand(turn)
             elif getattr(self, action) is not None:
-                self.play_sets_turn_attr(turn, action)
+                self.set_turn_attr(turn, action)
 
-    def play_adds_cards_to_current_hand(self, turn):
+    def add_cards_to_current_hand(self, turn):
         try:
             value = getattr(self, 'cards')
             for i in range(value):
@@ -295,7 +295,7 @@ class Card(object):
         except TypeError:
             pass
 
-    def play_sets_turn_attr(self, turn, action):
+    def set_turn_attr(self, turn, action):
         value = getattr(turn, action)
         value += getattr(self, action)
         setattr(turn, action, value)
